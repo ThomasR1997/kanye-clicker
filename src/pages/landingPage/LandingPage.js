@@ -7,7 +7,6 @@ import {
   ImageDiv,
   ProductDiv,
   QuoteDiv,
-  ShopDiv,
   StyledQuote,
 } from "../../components/StyledComponents";
 
@@ -31,20 +30,20 @@ import kanye16 from "./landingPageImages/kanye16.jpg";
 import kanye17 from "./landingPageImages/kanye17.jpg";
 
 export const LandingPage = () => {
-  // State for health
   const [health, setHealth] = useState(10);
-
-  // State used to track how many Kanye's defeated
+  const [maxHealth, setMaxHealth] = useState(health);
   const [kanyesDefeated, setKanyesDefeated] = useState(0);
+  const [coins, setCoins] = useState(0);
+  const [clickDamage, setClickDamage] = useState(1);
+  const [ownedUpgrade1, setOwnedUpgrade1] = useState(0);
+  const [enemyName, setEnemyName] = useState("Peasant");
+  const [upgrade1Price, setUpgrade1Price] = useState(5);
 
   // State for Image
   const [randomKanye, setRandomKanye] = useState();
 
   // State for api quotes
   const [quote, setQuote] = useState([]);
-
-  const [coins, setCoins] = useState(0);
-  const [clickDamage, setClickDamage] = useState(1);
 
   // fetch api data
   const fetchData = async () => {
@@ -99,17 +98,46 @@ export const LandingPage = () => {
       setHealth((prev) => prev - clickDamage);
     } else if (health <= 0) {
       setKanyesDefeated((prev) => prev + 1);
-      setCoins((prev) => prev + 1);
       fetchData();
       getRandomKanye();
-      setHealth(10);
+
+      if (kanyesDefeated === 9) {
+        setHealth(50);
+        setMaxHealth(50);
+        setEnemyName("Boss");
+      } else if (kanyesDefeated === 10) {
+        setCoins((prev) => prev + 5);
+      } else if (kanyesDefeated === 19) {
+        setHealth(5000);
+        setMaxHealth(5000);
+        setEnemyName("Boss");
+      } else if (kanyesDefeated === 20) {
+        setCoins((prev) => prev + 100);
+      } else if (kanyesDefeated >= 20) {
+        setCoins((prev) => prev + 5);
+        setEnemyName("Peasant");
+        setHealth(100);
+        setMaxHealth(100);
+      } else if (kanyesDefeated >= 10) {
+        setCoins((prev) => prev + 2);
+        setEnemyName("peasant");
+        setHealth(30);
+        setMaxHealth(30);
+      } else {
+        setHealth(10);
+        setMaxHealth(10);
+        setEnemyName("Peasant");
+        setCoins((prev) => prev + 1);
+      }
     }
   };
 
   const damage1 = () => {
-    if (coins >= 10) {
+    if (coins >= upgrade1Price) {
       setClickDamage((prev) => prev + 1);
-      setCoins((prev) => prev - 10);
+      setCoins((prev) => prev - upgrade1Price);
+      setUpgrade1Price((prev) => prev + 5);
+      setOwnedUpgrade1((prev) => prev + 1);
       window.alert("Upgrade bought");
     } else {
       window.alert("Not enough KanyeBucks");
@@ -127,12 +155,19 @@ export const LandingPage = () => {
           <p>KanyeBucks: {coins}</p>
           <ProductDiv>
             <p>+1 Click damage</p>
-            <BuyButton onClick={() => damage1()}>10 KanyeBucks</BuyButton>
+            <p>Owned({ownedUpgrade1})</p>
+
+            <BuyButton onClick={() => damage1()}>
+              {upgrade1Price} KanyeBucks
+            </BuyButton>
           </ProductDiv>
         </ContainerDiv>
 
         <div>
-          <p>Health {health}/10</p>
+          <p>{enemyName}</p>
+          <p>
+            Health {health}/{maxHealth}
+          </p>
           <ImageDiv>
             <img src={randomKanye} alt="Ye" onClick={() => clickHandler()} />
           </ImageDiv>
