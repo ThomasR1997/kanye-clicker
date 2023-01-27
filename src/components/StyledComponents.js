@@ -3,6 +3,7 @@ import styled from "styled-components";
 export const BackgroundDiv = styled.div`
   background-color: gray;
   padding: 10px 10px 100px;
+  min-height: 100vh;
 `;
 
 export const FlexDiv = styled.div`
